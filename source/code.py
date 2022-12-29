@@ -39,30 +39,24 @@ TABS_Y = 15
 BUTTON_HEIGHT = 40
 BUTTON_WIDTH = 80
 
-# Default State
+# Default state
 gAppState = {
-    'view': 1,
-    'icon': 1,
-    'btnMode': 1,
-    'swState': 0
+    'view': 1,      # Global VIEW state
+    'icon': 1,      # Global ICON state
+    'btnMode': 1,   # Global BUTTON mode
+    'swState': 0    # Global SWITCH state
 }
-
-gView = 1           # Global View State
-gIcon = 1
-gMode = 1           # Global Button Mode
-gState = 0          # Global Switch State
 
 # ------------- Functions ------------- #
 # Backlight function
-# Value between 0 and 1 where 0 is OFF, 0.5 is 50% and 1 is 100% brightness.
 def set_backlight(val):
-    val = max(0, min(1.0, val))
     try:
         board.DISPLAY.auto_brightness = False
     except AttributeError:
         pass
 
-    board.DISPLAY.brightness = val
+    # Value between 0 and 1 where 0 is OFF, 0.5 is 50% and 1 is 100% brightness.
+    board.DISPLAY.brightness = max(0, min(1.0, val))
 
 
 # Helper for cycling through a number set of 1 to x.
@@ -571,8 +565,8 @@ while loopFlg:
         touch, light, get_Temperature(adt)
     )
 
-    # Will also cause screen to dim when hand is blocking sensor to touch screen
     # Adjust backlight
+    # Will also cause screen to dim when hand is blocking sensor to touch screen
     if light < 1500:
         set_backlight(0.1)
     elif light < 3000:
