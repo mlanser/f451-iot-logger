@@ -8,7 +8,7 @@ etc.) of the IoT Logger device.
 import time
 import board
 import displayio
-import neopixel
+
 from adafruit_button import Button
 from adafruit_bitmap_font import bitmap_font
 from adafruit_display_text.label import Label
@@ -40,9 +40,6 @@ COLOR_GREEN = 0x00FF00
 COLOR_BLUE = 0x0000FF
 COLOR_PURPLE = 0xFF00FF
 COLOR_TURQUOISE = 0x00FFFF
-
-BRIGHT_MIN = 0      # Brightness of the pixel(s) between 0.0 and 
-BRIGHT_MAX = 1      # 1.0 where 1.0 is full brightness
 
 ROT_LAND_RHT = 0    # Rotation 0 degrees: landscape - power right
 ROT_PORT_TOP = 90   #     "   90    "     portrait  - power top
@@ -237,17 +234,20 @@ class Display(object):
         self.buttons[BTN_MODE]["btn"].label = BTN_LBL_PAUSE
         self.buttons[BTN_MODE]["btn"].selected = True
         self.buttons[BTN_MODE]["state"] = True
+        return self
 
     def select_pause_mode(self):
         self.buttons[BTN_MODE]["btn"].label = BTN_LBL_RUN
         self.buttons[BTN_MODE]["btn"].selected = False
         self.buttons[BTN_MODE]["state"] = False
+        return self
 
     def select_chart_view(self):
         self.buttons[BTN_VIEW]["btn"].label = BTN_LBL_LOG
         self.buttons[BTN_VIEW]["btn"].selected = True
         self.buttons[BTN_VIEW]["state"] = True
         self.switch_view(self.views[VIEW_CHART])
+        return self
 
     def select_log_view(self, inStr=""):
         self.buttons[BTN_VIEW]["btn"].label = BTN_LBL_CHART
@@ -256,6 +256,7 @@ class Display(object):
         self._wrap_area_text(AREA_LOG, inStr)
         _hide_layer(self.views[VIEW_SPLASH], self.views[VIEW_CHART])
         _show_layer(self.views[VIEW_SPLASH], self.views[VIEW_LOG])
+        return self
 
     def switch_view(self, view):
         self._display.show(self.views[view])
@@ -280,6 +281,7 @@ class Display(object):
             pass
 
         self._display.brightness = val
+        return self
 
     def update_log(self, inStr):
         prntStr = str(inStr)[0:90]              # We want max 90 chars
@@ -287,16 +289,22 @@ class Display(object):
         if self.areas[AREA_LOG]["state"]:       # Is 'counter' area active?
             self._wrap_area_text(AREA_LOG, prntStr)
 
+        return self
+
     def update_status(self, inStr):
         prntStr = str(inStr)[0:30]              # We want max 30 chars
 
         if self.areas[AREA_STATUS]["state"]:       # Is 'counter' area active?
             self.areas[AREA_STATUS]["area"].text = prntStr
 
+        return self
+
     def update_counter(self, inVal):
         prntVal = int(inVal) % 100              # We want max 2 digits!
         if self.areas[AREA_CNTR]["state"]:      # Is 'counter' area active?
             self.areas[AREA_CNTR]["area"].text = "{: >2} sec".format(prntVal)
+
+        return self
 
     def self_test(self):
         print("Display Dims:   {}px(W) x {}px(H)".format(self.width, self.height))
@@ -306,21 +314,6 @@ class Display(object):
         for nm in self.views.keys():
             print("   - {}".format(nm))
         self._state.self_test()    
-
-
-class Pixel(object):
-    """IoT Logger pixel class.
-
-    This class manages the physical (PyPortal) LED pixel 
-    component that we can use for status alerts, etc.
-    """
-
-    def __init__(self):
-        self.pixel = None
-
-    def init(self):
-        self.pixel = neopixel.NeoPixel(board.NEOPIXEL, 1, brightness=BRIGHT_MAX)
-        return self
 
 
 class State(object):
